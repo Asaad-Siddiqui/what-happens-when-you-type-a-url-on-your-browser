@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { Component, useEffect, useMemo, useRef, type ReactNode } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useGLTF } from "@react-three/drei";
+import { Edges, RoundedBox, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { BRIDGES, CLIENT, CZ, SERVER, TOWER_H, reversed } from "./parts/Canyon";
 import { Packet, type PacketHandle } from "@/core/Packet";
@@ -195,6 +195,53 @@ function preparePadlock(src: THREE.Object3D) {
   const wrap = new THREE.Group();
   wrap.add(root);
   return wrap;
+}
+
+/**
+ * If the padlock model cannot be loaded (missing file, network hiccup), the
+ * whole page must not die: drei rethrows loader errors during render, and
+ * without a boundary React unmounts the entire app. On any error we swap in
+ * a procedural neon padlock built from primitives, animated by the same
+ * group ref, so the TLS stage still tells its story.
+ */
+class ModelBoundary extends Component<{ fallback: ReactNode; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  override componentDidCatch() {
+    // The fallback below replaces the model; nothing else to do.
+  }
+  override render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
+/** Procedural stand-in for the padlock model: shackle + body + keyhole. */
+function FallbackPadlock({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
+  return (
+    <group ref={groupRef} position={LOCK_POS} scale={0}>
+      {/* shackle */}
+      <mesh position={[0, 0.75, 0]}>
+        <torusGeometry args={[1.5, 0.32, 16, 40, Math.PI]} />
+        <meshStandardMaterial color="#12303f" emissive="#e879f9" emissiveIntensity={0.85} roughness={0.35} metalness={0.2} />
+      </mesh>
+      {/* body */}
+      <RoundedBox args={[3.6, 2.8, 1.3]} radius={0.32} smoothness={4} position={[0, -0.6, 0]}>
+        <meshStandardMaterial color="#0b2537" emissive="#22d3ee" emissiveIntensity={0.5} roughness={0.4} metalness={0.15} />
+        <Edges scale={1.02} color="#e879f9" />
+      </RoundedBox>
+      {/* keyhole */}
+      <mesh position={[0, -0.35, 0.68]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.34, 0.34, 0.1, 24]} />
+        <meshBasicMaterial color="#04121f" />
+      </mesh>
+      <mesh position={[0, -0.95, 0.68]}>
+        <boxGeometry args={[0.3, 0.75, 0.1]} />
+        <meshBasicMaterial color="#04121f" />
+      </mesh>
+    </group>
+  );
 }
 
 function Padlock({ groupRef }: { groupRef: React.RefObject<THREE.Group | null> }) {
@@ -416,7 +463,9 @@ function Scene() {
           }}
         />
       ))}
-      <Padlock groupRef={lock} />
+      <ModelBoundary fallback={<FallbackPadlock groupRef={lock} />}>
+        <Padlock groupRef={lock} />
+      </ModelBoundary>
       <Converge matRef={converge} />
       <sprite ref={halo} position={LOCK_POS} visible={false}>
         <spriteMaterial map={glowTexture()} color={hdr(COLORS.cyan, 0.3)} transparent depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
