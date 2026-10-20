@@ -813,3 +813,94 @@ button:focus-visible {
     animation: none;
   }
 }
+
+/* -------------------- mobile decongestion (final) -------------------- */
+@media (max-width: 720px) {
+  .hud-top {
+    gap: 6px;
+  }
+  .hud-stage {
+    padding: 9px 11px;
+    max-width: calc(100% - 88px);
+    border-radius: 14px;
+  }
+  .hud-kicker {
+    font-size: 10px;
+  }
+  .hud-title {
+    font-size: 20px;
+    margin-top: 6px;
+  }
+  .hud-concept {
+    font-size: 12px;
+    line-height: 1.45;
+    margin-top: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .hud-clock {
+    padding: 8px 9px;
+    border-radius: 14px;
+  }
+  .hud-clock-label {
+    font-size: 9px;
+  }
+  .hud-clock-value {
+    font-size: 22px;
+  }
+  .hud-clock-sub {
+    font-size: 9px;
+    max-width: 86px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hud-badge {
+    font-size: 9px;
+    padding: 1px 6px;
+  }
+  .hud-rail {
+    gap: 11px;
+    padding: 8px 13px;
+    bottom: calc(var(--gutter) + 22px);
+  }
+  .hud-tick-dot {
+    width: 11px;
+    height: 11px;
+  }
+  .hud-hint {
+    bottom: calc(var(--gutter) + 82px);
+    gap: 7px;
+    font-size: 10px;
+  }
+  .hud-try {
+    min-height: 42px;
+    padding: 9px 18px;
+    font-size: 13px;
+  }
+  .hud-card {
+    bottom: calc(var(--gutter) + 138px);
+    padding: 16px 18px;
+  }
+  .hud-caption {
+    bottom: calc(var(--gutter) + 138px);
+    padding: 10px 14px;
+  }
+  .hud-credit {
+    font-size: 9px;
+    bottom: 5px;
+  }
+}
+@media (max-width: 380px) {
+  .hud-title {
+    font-size: 18px;
+  }
+  .hud-clock-value {
+    font-size: 20px;
+  }
+  .hud-stage {
+    max-width: calc(100% - 80px);
+  }
+}
