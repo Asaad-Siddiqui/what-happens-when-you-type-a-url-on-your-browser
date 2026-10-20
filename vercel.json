@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
   "functions": {
-    "src/app/api/probe/route.ts": { "regions": ["fra1", "iad1", "sfo1", "bom1", "sin1"] }
+    "src/app/api/probe/route.ts": { "regions": ["iad1"] }
   }
 }
